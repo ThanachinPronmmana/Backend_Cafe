@@ -1,5 +1,6 @@
 const mongoose = require("mongoose")
 const foodSchema = mongoose.Schema({
+    
     name:{
         type:String,
         required:true
@@ -15,6 +16,10 @@ const foodSchema = mongoose.Schema({
     isAvalible:{
         type:Boolean,
         default:true
+    },
+    cagetory:{
+        type:String,
+        default:true
     }
 },{timestamps:true})
-module.exports = mongoose.model("foods",foodSchema)
+module.exports = mongoose.model("Food",foodSchema)
