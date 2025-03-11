@@ -9,7 +9,7 @@ const foodSchema = mongoose.Schema({
         type:String,
         required:true
     },
-    price:{
+    count:{
         type:Number,
         required:true
     },
@@ -20,6 +20,7 @@ const foodSchema = mongoose.Schema({
     cagetory:{
         type:String,
         default:true
-    }
+    },
+    
 },{timestamps:true})
 module.exports = mongoose.model("Food",foodSchema)

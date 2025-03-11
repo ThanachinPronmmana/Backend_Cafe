@@ -9,4 +9,4 @@ const TableSchema = mongoose.Schema({
         default:true
     }
 },{timestamps:true})
-module.exports = mongoose.model("tables",TableSchema)
+module.exports = mongoose.model("Table",TableSchema)
