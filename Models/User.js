@@ -14,7 +14,7 @@ const userSchema = mongoose.Schema({
     },
     name:{
         type:String,
-        default:"Anonymous"
+        default:"Null"
     },
     phone:{
         type:String,

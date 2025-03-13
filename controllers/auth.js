@@ -4,8 +4,7 @@ const jwt = require("jsonwebtoken")
 exports.register = async(req,res)=>{
     try{
         const {email,password,name,phone} = req.body
-        
-        
+  
         if(!email){
             return res.status(400).json({
                 message:'Email is required!!!'
@@ -55,7 +54,7 @@ exports.register = async(req,res)=>{
 }
 exports.login = async(req,res)=>{
     try{
-        const {email,password} = req.body
+        const {email,password,name,phone} = req.body
         var user = await User.findOneAndUpdate({
             email
         },{new:true})
@@ -66,8 +65,25 @@ exports.login = async(req,res)=>{
                     message:"Password Invalid!!!"
                 })
             }
+            var payload = {
+                user:{
+                    email:user.email,
+                    name:user.name,
+                    phone:user.phone
+                }
+            }
+            jwt.sign(payload,"Invincible",{expiresIn:"1d"},(err,token)=>{
+                if(err) throw err;
+                res.json({
+                    token,payload
+                })
+            })
+        }else{
+            return res.status(400).json({
+                message:"User not found"
+            })
         }
-        res.send("Hello")
+        
     }catch(err){
         console.log(err)
         res.status(500).json({

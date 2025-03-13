@@ -1,6 +1,29 @@
 const mongoose = require("mongoose")
-const cartSchema = mongoose.Schema({
-    //FK ID User
-    //FK Food
-})
-module.exports = mongoose.model("Cart",cartSchema)
+const cartSchema = new mongoose.Schema({
+    customer_id: { type: mongoose.Schema.Types.ObjectId, ref: "User", required: true },
+    table_id: { type: mongoose.Schema.Types.ObjectId, ref: "Table", required: false }, // อาจเป็น null ถ้าสั่งกลับบ้าน
+    items: [
+      {
+        food_id: { 
+        type: mongoose.Schema.Types.ObjectId, 
+        ref: "Food", 
+        required: true 
+    }, 
+        quantity: { 
+            type: Number, 
+            required: true, 
+            min: 1 },
+        price: { 
+            type: Number, 
+            required: true 
+        } 
+      }
+    ],
+    total_price: { 
+        type: Number, 
+        required: true, 
+        default: 0 
+    },
+  }, { timestamps: true });
+  
+  module.exports = mongoose.model("Cart", cartSchema);

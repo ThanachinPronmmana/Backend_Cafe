@@ -1,10 +1,15 @@
 const mongoose = require("mongoose")
 const TableSchema = mongoose.Schema({
-    Number:{
+    number:{
+        type:Number,
+        required:true,
+        unique:true
+    },
+    seats:{
         type:Number,
         required:true
     },
-    Avalible:{
+    status:{
         type:Boolean,
         default:true
     }
