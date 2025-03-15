@@ -10,8 +10,9 @@ const TableSchema = mongoose.Schema({
         required:true
     },
     status:{
-        type:Boolean,
-        default:true
+        type:String,
+        enum:["Occupied","Available"],
+        default:"Available"
     }
 },{timestamps:true})
 module.exports = mongoose.model("Table",TableSchema)
