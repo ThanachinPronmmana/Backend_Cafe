@@ -21,6 +21,22 @@ const foodSchema = mongoose.Schema({
         type:String,
         default:true
     },
+    orderfood:[{
+        type:mongoose.Schema.Types.ObjectId,
+        ref:"Order"
+    }],
+    cartfood:[{
+        type:mongoose.Schema.Types.ObjectId,
+        ref:"Cart"
+    }],
+    images:[{
+        type:mongoose.Schema.Types.ObjectId,
+        ref:"Image"
+    }],
+    price:{
+        type:Number,
+    }
+
     
 },{timestamps:true})
 module.exports = mongoose.model("Food",foodSchema)

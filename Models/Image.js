@@ -16,10 +16,10 @@ const imageSchema = mongoose.Schema({
         type:String,
         required:true
     },
-    foodId:{
+    foodId:[{
         type:mongoose.Schema.Types.ObjectId,
         ref:'Food',
         required:true
-    }
+    }]
 },{timestamps:true})
 module.exports = mongoose.model("Image",imageSchema)

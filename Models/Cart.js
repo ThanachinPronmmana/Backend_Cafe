@@ -1,14 +1,22 @@
 const mongoose = require("mongoose")
 const cartSchema = new mongoose.Schema({
-    customer_id: { type: mongoose.Schema.Types.ObjectId, ref: "User", required: true },
-    table_id: { type: mongoose.Schema.Types.ObjectId, ref: "Table", required: false }, // อาจเป็น null ถ้าสั่งกลับบ้าน
+    customer_id: { 
+        type: mongoose.Schema.Types.ObjectId, 
+        ref: "User", 
+        required: true 
+    },
+    table_id: { 
+        type: mongoose.Schema.Types.ObjectId, 
+        ref: "Table", 
+        required: false 
+    }, 
     items: [
       {
         food_id: { 
         type: mongoose.Schema.Types.ObjectId, 
         ref: "Food", 
         required: true 
-    }, 
+    },
         quantity: { 
             type: Number, 
             required: true, 
