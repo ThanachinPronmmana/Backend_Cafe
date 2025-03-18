@@ -22,12 +22,12 @@ const userSchema = mongoose.Schema({
     order_Id:{
         type:mongoose.Schema.Types.ObjectId,
         ref:"Order",
-        required:true
+        required:false
     },
     cart_Id:{
         type:mongoose.Schema.Types.ObjectId,
         ref:"Cart",
-        required:true
+        required:false
     }
 
 },{timestamps:true})

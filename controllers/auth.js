@@ -55,7 +55,7 @@ exports.register = async(req,res)=>{
 exports.login = async(req,res)=>{
     try{
         const {email,password,name,phone} = req.body
-        var user = await User.findOneAndUpdate({
+        let user = await User.findOneAndUpdate({
             email
         },{new:true})
         if(user){
@@ -65,7 +65,7 @@ exports.login = async(req,res)=>{
                     message:"Password Invalid!!!"
                 })
             }
-            var payload = {
+            let payload = {
                 user:{
                     email:user.email,
                     name:user.name,

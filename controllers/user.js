@@ -1,31 +1,18 @@
 const { findOneAndUpdate, findById } = require("../Models/Cart")
 const Reservation = require("../Models/Reservation")
+const User = require("../Models/User")
 const Table = require("../Models/Table")
-exports.createTable = async (req, res) => {
-    try {
-        const { number, seats, status } = req.body
-        const createTable = new Table({
-            number,
-            seats,
-            status,
-        })
 
-        await createTable.save()
-        res.send("Create table Succeed")
-    } catch (err) {
-        console.log(err)
-        res.status(500).json({
-            message: "Server Error"
-        })
-    }
-}
+
+
 exports.createReservation = async (req, res) => {
     try {
         const { userId, tableId, reservation_time, user_name } = req.body
         //find table id
+        const formattedDate = new Date(reservation_time)
         const table = await Table.findById(tableId)
         if (!table || table.status !== "Available") {
-            res.status(404).json({
+            return res.status(404).json({
                 message: "The table is not Available"
             })
         }
@@ -34,7 +21,7 @@ exports.createReservation = async (req, res) => {
             user_name,
             userId,
             tableId,
-            reservation_time,
+            reservation_time:formattedDate,
             status: "Reserved"
         });
         await newReservation.save()
@@ -86,12 +73,15 @@ exports.updateReservation = async (req, res) => {
     try {
         const { id } = req.params;
         const reservation = await Reservation.findById(id)
+        const formattedDate = new Date(reservation_time)
         if(!reservation){
             return res.status(404).json({message:"Reservation not found"})
         }
         const { user_name,reservation_time } = req.body
-        const updateReservation = await Reservation.findOneandUpdate(
-            {_id:id},{user_name,reservation_time},{new:true}
+        const updateReservation = await Reservation.findOneAndUpdate(
+            {_id:id},
+            {user_name,reservation_time:formattedDate},
+            {new:true}
         )
         res.json(updateReservation)
         
@@ -122,8 +112,18 @@ exports.updateReservation = async (req, res) => {
 exports.removeReservation = async(req,res)=>{
     try{
         const{id} = req.params
-        const deleteReservation = await Reservation.findByIdAndDelete({_id:id})
-        res.json(deleteReservation)
+        const reservation = await Reservation.findById(id)
+        if(!reservation){
+            return res.status(404).json({
+                message:"Reservation not found"
+            })
+        }
+        const {tableId} = reservation
+        await Reservation.findByIdAndDelete(id)
+        if(tableId){
+            await Table.findByIdAndUpdate(tableId,{status:"Available"})
+        }
+        res.send("Reservation deleted successfully")
     }catch(err){
         console.log(err)
         res.status(500).json({
@@ -131,4 +131,17 @@ exports.removeReservation = async(req,res)=>{
         })
     }
 }
+exports.listUser = async(req,res)=>{
+    try{
+        
+        const user = await User.find().select("name phone").populate("order_Id cart_Id")
+        res.json(user)
+    }catch(err){
+        console.log(err)
+        res.status(500).json({
+            message:"Server Error"
+        })
+    }
+}
+
 
