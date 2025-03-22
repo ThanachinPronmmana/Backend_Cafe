@@ -3,17 +3,17 @@ const orderSchema = mongoose.orderSchema({
     //FK ID FOOD
     //FK  Reservation
     //FK Cart
-    food_Id:{
+    foodId:{
         type:mongoose.Schema.Types.ObjectId,
         ref:"Food",
         required:true
     },
-    cart_Id:{
+    cartId:{
         type:mongoose.Schema.Types.ObjectId,
         ref:"Cart",
         required:true
     },
-    reservation_Id:{
+    reservationId:{
         type:mongoose.Schema.Types.ObjectId,
         ref:"Reservation",
         required:true
@@ -23,8 +23,8 @@ const orderSchema = mongoose.orderSchema({
         required:false
     },
     order_status:{
-        type:Boolean,
-        default:true
+        enum:["Readly","Unready"],
+        default:"Readly"
     }
 },{timestamps:true})
 module.exports = mongoose.model("Order",orderSchema)

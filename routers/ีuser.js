@@ -3,7 +3,6 @@ const router = express.Router()
 const {createReservation,
     listReservation,
     listByIdReservation,
-    updateReservation,
     removeReservation,
     listUser
 } = require("../controllers/user")
@@ -11,7 +10,6 @@ const {createReservation,
 router.post("/reservation",createReservation)
 router.get("/reservation",listReservation)
 router.get("/reservation/:id",listByIdReservation)
-router.put("/reservation/:id",updateReservation)
 router.delete("/reservation/:id",removeReservation)
 
 router.get("/user",listUser)

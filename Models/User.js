@@ -19,12 +19,12 @@ const userSchema = mongoose.Schema({
         type:String,
         default:"N/A"
     },
-    order_Id:{
+    orderId:{
         type:mongoose.Schema.Types.ObjectId,
         ref:"Order",
         required:false
     },
-    cart_Id:{
+    cartId:{
         type:mongoose.Schema.Types.ObjectId,
         ref:"Cart",
         required:false

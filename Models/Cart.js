@@ -1,18 +1,18 @@
 const mongoose = require("mongoose")
 const cartSchema = new mongoose.Schema({
-    customer_id: { 
+    userId: { 
         type: mongoose.Schema.Types.ObjectId, 
         ref: "User", 
         required: true 
     },
-    table_id: { 
+    reservationId: { 
         type: mongoose.Schema.Types.ObjectId, 
-        ref: "Table", 
+        ref: "Reservation", 
         required: false 
     }, 
     items: [
       {
-        food_id: { 
+        foodId: { 
         type: mongoose.Schema.Types.ObjectId, 
         ref: "Food", 
         required: true 

@@ -14,18 +14,18 @@ const foodSchema = mongoose.Schema({
         required:true
     },
     isAvalible:{
-        type:Boolean,
-        default:true
+        enum:["Avalible","Unavailable"],
+        default:"Avalible"
     },
     cagetory:{
         type:String,
         default:true
     },
-    orderfood:[{
+    orderId:[{
         type:mongoose.Schema.Types.ObjectId,
         ref:"Order"
     }],
-    cartfood:[{
+    cartId:[{
         type:mongoose.Schema.Types.ObjectId,
         ref:"Cart"
     }],

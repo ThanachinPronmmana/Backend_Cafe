@@ -32,8 +32,8 @@ exports.removeTable = async(req,res)=>{
     try{
         const {id} = req.params
         await Reservation.deleteMany({tableId:id})
-        const table = await Table.findByIdAndDelete({_id:id})
-        res.json(table)
+        await Table.findByIdAndDelete({_id:id})
+        res.send("Delete Success")
     }catch(err){
         console.log(err)
         res.status(500).json({
@@ -55,7 +55,9 @@ exports.updateTable = async(req,res)=>{
             {number,seats,status},
             {new:true}
         )
-        res.send("Update Table Succeed")
+        res.json(updatetable)
+        
+        
     }catch(err){
         console.log(err)
         res.status(500).json({
