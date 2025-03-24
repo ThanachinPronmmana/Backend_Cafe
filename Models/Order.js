@@ -1,5 +1,5 @@
 const mongoose = require("mongoose")
-const orderSchema = mongoose.orderSchema({
+const orderSchema = mongoose.Schema({
     //FK ID FOOD
     //FK  Reservation
     //FK Cart
@@ -23,8 +23,9 @@ const orderSchema = mongoose.orderSchema({
         required:false
     },
     order_status:{
-        enum:["Readly","Unready"],
-        default:"Readly"
+        type:String,
+        enum:["Ready","Unready"],
+        default:"Ready"
     }
 },{timestamps:true})
 module.exports = mongoose.model("Order",orderSchema)

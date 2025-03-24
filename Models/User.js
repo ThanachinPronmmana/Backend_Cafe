@@ -29,6 +29,8 @@ const userSchema = mongoose.Schema({
         ref:"Cart",
         required:false
     }
-
+    
 },{timestamps:true})
+
+
 module.exports = mongoose.model("User",userSchema)

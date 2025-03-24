@@ -14,6 +14,7 @@ const foodSchema = mongoose.Schema({
         required:true
     },
     isAvalible:{
+        type:String,
         enum:["Avalible","Unavailable"],
         default:"Avalible"
     },

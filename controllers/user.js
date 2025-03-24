@@ -11,6 +11,18 @@ exports.createReservation = async (req, res) => {
     try {
         const { userId, tableId, reservation_time, user_name } = req.body
         //find table id
+        const checkuserId = await User.findById(userId)
+        if(!checkuserId){
+            return res.status(404).json({
+                message:"User not found"
+            })
+        }
+        const havereservation = await Reservation.findOne({userId,status:"Reserved"})
+        if(havereservation){
+            return res.status(404).json({
+                message:"You already have a reservation"
+            })
+        }
         const formattedDate = new Date(reservation_time)
         const table = await Table.findById(tableId)
         if (!table || table.status !== "Available") {
@@ -148,21 +160,43 @@ exports.listUser = async(req,res)=>{
 //check userCart
 exports.userCart = async(req,res)=>{
     try{
-        const { userId } = req.body
+        const { userId,reservationId} = req.body
         console.log(userId)
-        const cart = await Cart.findOne({userId}).populate("items.foodId","quantity")
-        if(!cart || cart.items.length === 0 ){
+        console.log(reservationId)
+        const user = await User.findById(userId)
+        const reservation = await Reservation.findById(reservationId)
+        if(!user){
             return res.status(400).json({
-                message:"Cart not empty"
+                message:"User not Found"
             })
         }
-        for(const item of cart.items){
-            if(!item.foodId || item.quantity > item.foodId.quantity){
-                return res.status(400).json({
-                    message:`Sorry. Food ${item.foodId.name || "food"} Out`
-                })
-            }
+        if(!reservation){
+            return res.status(400).json({
+                message:"Reservation not Found"
+            })
         }
+        //ค้นหาตะกร้าผู้ใช้
+        const cart = await Cart.findOne({userId}).populate("items.foodId","quantity price")
+        if(!cart || cart.items.length === 0 ){
+            return res.status(400).json({
+                message:"Cart is empty"
+            })
+        }
+        const outofstock = cart.items.find(item=>
+             !item.foodId || item.quantity > item.foodId.quantity
+    )
+    if(outofstock){
+        return res,statas(400).json({
+            message:`Sorry. Food ${outofstock.foodId.name || "food"} Out`
+        })
+    }
+        // for(const item of cart.items){
+        //     if(!item.foodId || item.quantity > item.foodId.quantity){
+        //         return res.status(400).json({
+        //             message:`Sorry. Food ${item.foodId.name || "food"} Out`
+        //         })
+        //     }
+        // }
         //Delete old Cart item 
         await Cart.deleteMany({userId})
 
@@ -215,6 +249,11 @@ exports.getUserCart = async (req,res)=>{
 //ในกรณีที่ตะกร้าว่างเปล่า
 exports.emptyCart = async(req,res)=>{
     const cart = await Cart.findOne({userId:req.user.id})
+    if(!cart){
+        return res.status(400).json({
+            message:"No cart"
+        })
+    }
 
 
     if(!cart){
@@ -222,7 +261,7 @@ exports.emptyCart = async(req,res)=>{
             message:"Cart not found"
         })
     }
-    const result = await Cart.deleteOne({
+    await Cart.deleteMany({
         userId:req.user.id
     })
 }
