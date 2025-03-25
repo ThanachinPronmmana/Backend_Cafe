@@ -9,48 +9,65 @@ const Food = require("../Models/Food")
 
 exports.createReservation = async (req, res) => {
     try {
-        const { userId, tableId, reservation_time, user_name } = req.body
-        //find table id
-        const checkuserId = await User.findById(userId)
-        if(!checkuserId){
-            return res.status(404).json({
-                message:"User not found"
-            })
-        }
-        const havereservation = await Reservation.findOne({userId,status:"Reserved"})
-        if(havereservation){
-            return res.status(404).json({
-                message:"You already have a reservation"
-            })
-        }
-        const formattedDate = new Date(reservation_time)
-        const table = await Table.findById(tableId)
-        if (!table || table.status !== "Available") {
-            return res.status(404).json({
-                message: "The table is not Available"
-            })
+        const { userId, tableId, reservation_time, user_name } = req.body;
+        
+        // ตรวจสอบว่ามี userId อยู่ในระบบหรือไม่
+        const checkuserId = await User.findById(userId);
+        if (!checkuserId) {
+            return res.status(400).json({ message: "User not found" });
         }
 
+        // ตรวจสอบว่าผู้ใช้มีการจองอยู่แล้วหรือไม่
+        const havereservation = await Reservation.findOne({ userId, status: "Reserved" });
+        if (havereservation) {
+            return res.status(400).json({ message: "You already have a reservation" });
+        }
+
+        // ตรวจสอบว่าโต๊ะว่างหรือไม่
+        const table = await Table.findById(tableId);
+        if (!table || table.status !== "Available") {
+            return res.status(400).json({ message: "The table is not Available" });
+        }
+
+        // แปลงเวลาการจอง
+        const formattedDate = new Date(reservation_time);
+
+        // สร้างการจองใหม่
         const newReservation = new Reservation({
             user_name,
             userId,
             tableId,
-            reservation_time:formattedDate,
+            reservation_time: formattedDate,
             status: "Reserved"
         });
-        await newReservation.save()
+        await newReservation.save();
 
+        // อัปเดตสถานะโต๊ะเป็น Reserved
+        await Table.findByIdAndUpdate(tableId, { status: "Reserved" });
 
-        await Table.findByIdAndUpdate(tableId, { status: "Reserved" })
-        res.send("Create Reservation success")
+        // ตั้งเวลาให้ Reservation ถูกยกเลิกหากผู้ใช้ไม่มาตรงเวลา + 15 นาที
+        const cancelTime = new Date(formattedDate.getTime() + 15 * 60 * 1000); // บวก 15 นาที
+
+        setTimeout(async () => {
+            const reservation = await Reservation.findById(newReservation._id);
+            const now = new Date();
+
+            // หากเวลาปัจจุบันเกินเวลาจอง + 15 นาที และยังไม่ถูกเปลี่ยนสถานะ -> ยกเลิกการจอง
+            if (reservation && reservation.status === "Reserved" && now >= cancelTime) {
+                reservation.status = "Canceled";
+                await reservation.save();
+                await Table.findByIdAndUpdate(tableId, { status: "Available" });
+                console.log(`Reservation ${newReservation._id} has been canceled due to no-show.`);
+            }
+        }, 15 * 60 * 1000); // 15 นาทีหลังเวลาจอง
+
+        res.json({ message: "Create Reservation success", reservation: newReservation });
 
     } catch (err) {
-        console.log(err)
-        res.status(500).json({
-            message: "Server Error"
-        })
+        console.log(err);
+        res.status(500).json({ message: "Server Error" });
     }
-}
+};
 exports.listReservation = async (req, res) => {
     try {
 
@@ -129,7 +146,7 @@ exports.removeReservation = async(req,res)=>{
         const{id} = req.params
         const reservation = await Reservation.findById(id)
         if(!reservation){
-            return res.status(404).json({
+            return res.status(400).json({
                 message:"Reservation not found"
             })
         }
@@ -176,7 +193,7 @@ exports.userCart = async(req,res)=>{
             })
         }
         //ค้นหาตะกร้าผู้ใช้
-        const cart = await Cart.findOne({userId}).populate("items.foodId","quantity price")
+        const cart = await Cart.findOne({userId,reservationId}).populate("items.foodId","quantity price")
         if(!cart || cart.items.length === 0 ){
             return res.status(400).json({
                 message:"Cart is empty"
@@ -248,26 +265,35 @@ exports.getUserCart = async (req,res)=>{
 }
 //ในกรณีที่ตะกร้าว่างเปล่า
 exports.emptyCart = async(req,res)=>{
-    const cart = await Cart.findOne({userId:req.user.id})
-    if(!cart){
-        return res.status(400).json({
-            message:"No cart"
+    try{
+        const cart = await Cart.findOne({userId:req.user.id})
+        if(!cart){
+            return res.status(400).json({
+                message:"Cart not found"
+            })
+        }
+        await Cart.deleteMany({
+            userId:req.user.id
+        })
+        const result = await Cart.deleteMany({
+            userId:req.user.id
+        })
+    
+        res.json({
+            message:"Cart Empty Success",
+            deleteCount:result.count
         })
     }
-
-
-    if(!cart){
-        return res.status(400).json({
-            message:"Cart not found"
+    catch(err){
+        console.log(err)
+        res.status(500).json({
+            message:"Server Error"
         })
     }
-    await Cart.deleteMany({
-        userId:req.user.id
-    })
 }
 exports.saveorder = async(req,res)=>{
     try{
-
+        const {reservationId,cartId,foodId} = req.body
     }catch(err){
         console.log(err)
         res.status(500).json({

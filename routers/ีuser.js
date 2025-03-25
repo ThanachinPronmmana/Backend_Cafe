@@ -15,6 +15,7 @@ router.delete("/reservation/:id",removeReservation)
 
 router.get("/user",listUser)
 router.post("/user",userCart)
+router.get("/")
 
 
 
