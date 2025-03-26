@@ -91,3 +91,21 @@ exports.login = async(req,res)=>{
         })
     }
 }
+exports.currentUser = async (req, res) => {
+    try {
+        if (!req.user) {
+            return res.status(400).json({ message: 'User not authenticated' });
+        }
+
+        const user = await User.findOne({ email: req.user.email }).select('id email name role');
+
+        if (!user) {
+            return res.status(404).json({ message: 'User not found' });
+        }
+
+        res.json({ user });
+    } catch (err) {
+        console.log(err);
+        res.status(500).json({ message: 'Server Error' });
+    }
+};

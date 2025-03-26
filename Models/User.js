@@ -28,6 +28,15 @@ const userSchema = mongoose.Schema({
         type:mongoose.Schema.Types.ObjectId,
         ref:"Cart",
         required:false
+    },
+    reservationId:{
+        type:mongoose.Schema.Types.ObjectId,
+        ref:"Reservation",
+
+    },
+    tableId:{
+        type:mongoose.Schema.Types.ObjectId,
+        ref:"Table",
     }
     
 },{timestamps:true})

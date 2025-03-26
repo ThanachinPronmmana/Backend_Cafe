@@ -22,18 +22,18 @@ const foodSchema = mongoose.Schema({
         type:String,
         default:true
     },
-    orderId:[{
+    orderId:{
         type:mongoose.Schema.Types.ObjectId,
         ref:"Order"
-    }],
-    cartId:[{
+    },
+    cartId:{
         type:mongoose.Schema.Types.ObjectId,
         ref:"Cart"
-    }],
-    images:[{
+    },
+    images:{
         type:mongoose.Schema.Types.ObjectId,
         ref:"Image"
-    }],
+    },
     price:{
         type:Number,
     }

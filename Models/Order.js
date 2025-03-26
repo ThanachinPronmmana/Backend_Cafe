@@ -3,6 +3,11 @@ const orderSchema = mongoose.Schema({
     //FK ID FOOD
     //FK  Reservation
     //FK Cart
+    userId:{
+        type:mongoose.Schema.Types.ObjectId,
+        ref:"User",
+        required:true
+    },
     foodId:{
         type:mongoose.Schema.Types.ObjectId,
         ref:"Food",
@@ -26,6 +31,7 @@ const orderSchema = mongoose.Schema({
         type:String,
         enum:["Ready","Unready"],
         default:"Ready"
-    }
+    },
+    
 },{timestamps:true})
 module.exports = mongoose.model("Order",orderSchema)
