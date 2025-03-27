@@ -1,32 +1,33 @@
-const  Food = require("../Models/Food");
-const  Image = require("../Models/Image");
-const  multer = require("multer")
+const Food = require("../Models/Food");
+const Image = require("../Models/Image");
+const Cart = require("../Models/Cart")
+const multer = require("multer")
 
 
 const storage = multer.diskStorage({
-    destination:function(req,file,cb){
+    destination: function (req, file, cb) {
         //โฟลเดอร์สำหรับเก็บรูปภาพ
-        cb(null,'./images');
+        cb(null, './images');
     },
 
     //เปลี่ยนชื่อไฟล์ป้องกันชื่อซ้ำกัน
-    filename:function(req,file,cb){
-        cb(null,Date.now()+".jpg")
+    filename: function (req, file, cb) {
+        cb(null, Date.now() + ".jpg")
     }
 
 })
 //เริ่มต้นการ upload
 const upload = multer({
-    storage:storage
+    storage: storage
 })
 
 exports.upload = upload;
 
 exports.createFoods = async (req, res) => {
     try {
-       
-        const { name, quantity, count, cagetory, price, isAvalible,ImagesId } = req.body;
-        
+
+        const { name, quantity, count, cagetory, price, isAvalible, ImagesId } = req.body;
+
         // ตรวจสอบข้อมูลที่จำเป็น
         if (!name || !quantity || !count || !cagetory || !price) {
             return res.status(400).json({
@@ -41,7 +42,7 @@ exports.createFoods = async (req, res) => {
             count,
             cagetory,
             price,
-            ImagesId,
+            ImagesId: [],
             isAvalible: "Avalible"
         });
         await food.save();
@@ -59,7 +60,7 @@ exports.createFoods = async (req, res) => {
 
             // อัปเดต references ของรูปภาพใน Food
             await Food.findByIdAndUpdate(
-                food._id, 
+                food._id,
                 { $push: { images: image._id } },
                 { new: true }
             );
@@ -91,13 +92,17 @@ exports.getAllFoods = async (req, res) => {
 exports.updateFood = async (req, res) => {
     try {
         const { id } = req.params;
-        const updateData = req.body;
+        const { name, quantity, count, isAvalible, price } = req.body;
 
         const updatedFood = await Food.findByIdAndUpdate(
-            id, 
-            updateData, 
+            id,
+            { name, quantity, count, isAvalible, price },
             { new: true }
         );
+        await Cart.updateMany(
+            { "items.foodId": id },
+            { $pull: { items: { foodId: id } } }
+        )
 
         if (!updatedFood) {
             return res.status(404).json({ message: "ไม่พบรายการอาหาร" });
@@ -122,14 +127,17 @@ exports.deleteFood = async (req, res) => {
 
         // ลบรายการอาหาร
         const deletedFood = await Food.findByIdAndDelete(id);
-
+        await Cart.updateMany(
+            { "items.foodId": id }, // หา cart ที่มี foodId นี้
+            { $pull: { items: { foodId: id } } } // ลบ foodId ใน array items
+        );
         if (!deletedFood) {
             return res.status(404).json({ message: "ไม่พบรายการอาหาร" });
         }
 
-        res.json({ 
-            message: "ลบรายการอาหารสำเร็จ", 
-            deletedFood 
+        res.json({
+            message: "ลบรายการอาหารสำเร็จ",
+            deletedFood
         });
     } catch (err) {
         console.error('เกิดข้อผิดพลาดในการลบอาหาร:', err);
