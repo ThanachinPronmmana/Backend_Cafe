@@ -1,11 +1,12 @@
-const express = require("express")
-const router = express.Router()
-const {createFood} = require("../controllers/food")
+const express = require("express");
+const { createFoods,upload} = require("../controllers/food");
 
-router.get("/food",)
-router.get("/food/:id",)
-router.post("/food",createFood)
-router.put("/food/:id",)
-router.delete("/food/:id",)
+const router = express.Router();
 
-module.exports = router
+router.get("/food",);      // ✅ ดึงข้อมูลอาหารทั้งหมด
+router.get("/food/:id",); // ✅ ดึงข้อมูลอาหารตาม ID
+router.post("/food", upload.single("images"), createFoods);    // ✅ เพิ่มอาหารใหม่
+router.put("/food/:id",);  // ✅ อัปเดตข้อมูลอาหาร
+router.delete("/food/:id",); // ✅ ลบอาหาร
+
+module.exports = router;
