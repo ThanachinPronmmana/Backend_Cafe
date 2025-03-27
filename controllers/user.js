@@ -33,6 +33,7 @@ exports.createReservation = async (req, res) => {
         // แปลงเวลาการจอง
         const formattedDate = new Date(reservation_time);
         console.log(formattedDate)
+
         // สร้างการจองใหม่
         const newReservation = new Reservation({
             user_name,
@@ -44,6 +45,7 @@ exports.createReservation = async (req, res) => {
         await newReservation.save();
         //อัปเดต reservationId ของ User
         await User.findByIdAndUpdate(userId, { reservationId: newReservation._id })
+        
         // อัปเดตสถานะโต๊ะเป็น Reserved
         await Table.findByIdAndUpdate(tableId, { status: "Reserved" });
 
