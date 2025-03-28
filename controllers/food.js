@@ -171,7 +171,7 @@ const handleCategory = async (req, res, categoryId) => {
 //List MenuShow
 /*exports.listby = async (req, res) => {
     try {
-        const { sort, order, limit } = req.body;
+        const { order, limit } = req.body;
         const products = await Food.find()
             .populate("images")
             .sort({ [sort]: order }) // sort: price, name, quantity
@@ -188,7 +188,7 @@ const handleCategory = async (req, res, categoryId) => {
 exports.searchFilters = async (req,res) => {
     try{
         const {query,cagetory,price} = req.body //ต้องการค้นหาด้วยตัวอะไรบ้าง
-
+        
         if(query){
             console.log("query-->",query)
             await handleQuery(req,res,query) //ค้นหาด้วยชื่ออาหาร
@@ -202,9 +202,10 @@ exports.searchFilters = async (req,res) => {
             console.log("price-->",price)
             await handleQuery(req,res,query) //ค้นหาด้วยราคา
         }
-
+        
     }catch(err){
-
+        console.log(err)
+        res.status(500).json({ message: 'Server Error '})
     }
 
 };
