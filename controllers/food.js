@@ -1,10 +1,34 @@
+const mongoose = require("mongoose")
 const Food = require("../Models/Food");
 const Image = require("../Models/Image");
 const Cart = require("../Models/Cart")
-const multer = require("multer")
+//const multer = require("multer")
+const cloudinary = require("cloudinary").v2;  
+
+//Configuration
+cloudinary.config({
+    clound_name : process.env.CLOUDINARY_CLOUD_NAME,
+    api_key: process.env.CLOUDINARY_API_KEY,
+    api_secret: process.env.CLOUDINARY_API_SECRET,
+});
+
+exports.createImages = async (req, res, next) =>{
+    try{
+        console.log(req.body.image);
+        const {image} = req.body;
+        const result = await cloudinary.uploader.upload(image,{
+            public_id: `${Date.now()}`, 
+            resource_type: "auto",
+            folder:'Menu'
+        });
+        res.json({ result:result });
+    }   catch(eror) {
+        next(eror);
+    }
+};
 
 
-const storage = multer.diskStorage({
+/*const storage = multer.diskStorage({
     destination: function (req, file, cb) {
         //โฟลเดอร์สำหรับเก็บรูปภาพ
         cb(null, './images');
@@ -21,7 +45,7 @@ const upload = multer({
     storage: storage
 })
 
-exports.upload = upload;
+exports.upload = upload;*/
 
 exports.createFoods = async (req, res) => {
     try {
@@ -117,6 +141,77 @@ exports.updateFood = async (req, res) => {
         });
     }
 };
+
+//ค้นหาตามชื่อ
+const handleQuery = async (req, res, query) => {
+    try {
+        const products = await Food.find({
+            name: { $regex: query, $options: "i" } // ค้นหาโดยไม่สนตัวพิมพ์เล็ก/ใหญ่
+        }).populate("images");
+        res.json(products);
+    } catch (err) {
+        console.log(err);
+        res.status(500).json({ message: "Server Error" });
+    }
+};
+
+//ค้นหาตามหมวดหมู่
+const handleCategory = async (req, res, categoryId) => {
+    try {
+        const products = await Food.find({
+            cagetory: { $in: categoryId } // ตรวจสอบว่าอยู่ในหมวดไหน
+        }).populate("images");
+        res.json(products);
+    } catch (err) {
+        console.log(err);
+        res.status(500).json({ message: "Server Error" });
+    }
+};
+
+//List MenuShow
+/*exports.listby = async (req, res) => {
+    try {
+        const { sort, order, limit } = req.body;
+        const products = await Food.find()
+            .populate("images")
+            .sort({ [sort]: order }) // sort: price, name, quantity
+            .limit(limit ? parseInt(limit) : 10);
+
+        res.json(products);
+    } catch (err) {
+        console.log(err);
+        res.status(500).json({ message: "Server Error" });
+    }
+};*/
+
+//SearchFilter
+exports.searchFilters = async (req,res) => {
+    try{
+        const {query,cagetory,price} = req.body //ต้องการค้นหาด้วยตัวอะไรบ้าง
+
+        if(query){
+            console.log("query-->",query)
+            await handleQuery(req,res,query) //ค้นหาด้วยชื่ออาหาร
+
+        }
+        if(cagetory){
+            console.log("cagetory-->",cagetory)
+            await handleQuery(req,res,query) //ค้นหาด้วยหมวดหมู่
+        }
+        if(price){
+            console.log("price-->",price)
+            await handleQuery(req,res,query) //ค้นหาด้วยราคา
+        }
+
+    }catch(err){
+
+    }
+
+};
+
+
+
+
 
 exports.deleteFood = async (req, res) => {
     try {
