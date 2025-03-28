@@ -112,7 +112,20 @@ exports.getAllFoods = async (req, res) => {
         });
     }
 };
+exports.getfoodbycategory = async (req,res)=>{
+    try{
+        const {cagetory} = req.params;
+        console.log(category)
+        const foods = await Food.find({category:cagetory}).populate('images');
+        
+        res.json({
+            foods
+        })
+    }catch(err){
+        console.log(err)
 
+    }
+}
 exports.updateFood = async (req, res) => {
     try {
         const { id } = req.params;
