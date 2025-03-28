@@ -5,18 +5,24 @@ const {createReservation,
     listByIdReservation,
     removeReservation,
     listUser,
-    userCart
+    userCart,
+    getUserCart,
+    saveorder,
+    getorder
 } = require("../controllers/user")
-const {authCheck} = require("../Middleware/authCheck")
+
 
 router.post("/reservation",createReservation)
 router.get("/reservation",listReservation)
 router.get("/reservation/:id",listByIdReservation)
 router.delete("/reservation/:id",removeReservation)
 
-router.get("/user",authCheck,listUser)
+router.get("/user",listUser)
 router.post("/user",userCart)
-router.get("/")
+router.get("/listcart/:id",getUserCart)
+
+router.post("/order",saveorder)
+router.get("/order/:id",getorder)
 
 
 

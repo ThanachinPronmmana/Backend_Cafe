@@ -24,4 +24,4 @@ readdirSync("./routers").map((a)=>app.use("/api",require("./routers/"+a)))
 
 
 
-app.listen(5555,()=>console.log("On port 5555"))
+app.listen(8000,()=>console.log("On port 8000"))

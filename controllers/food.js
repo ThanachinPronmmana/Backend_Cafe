@@ -1,51 +1,27 @@
-const mongoose = require("mongoose")
 const Food = require("../Models/Food");
 const Image = require("../Models/Image");
 const Cart = require("../Models/Cart")
-//const multer = require("multer")
-const cloudinary = require("cloudinary").v2;  
-
-//Configuration
-cloudinary.config({
-    clound_name : process.env.CLOUDINARY_CLOUD_NAME,
-    api_key: process.env.CLOUDINARY_API_KEY,
-    api_secret: process.env.CLOUDINARY_API_SECRET,
-});
-
-exports.createImages = async (req, res, next) =>{
-    try{
-        console.log(req.body.image);
-        const {image} = req.body;
-        const result = await cloudinary.uploader.upload(image,{
-            public_id: `${Date.now()}`, 
-            resource_type: "auto",
-            folder:'Menu'
-        });
-        res.json({ result:result });
-    }   catch(eror) {
-        next(eror);
-    }
-};
+// const multer = require("multer")
 
 
-/*const storage = multer.diskStorage({
-    destination: function (req, file, cb) {
-        //โฟลเดอร์สำหรับเก็บรูปภาพ
-        cb(null, './images');
-    },
+// const storage = multer.diskStorage({
+//     destination: function (req, file, cb) {
+//         //โฟลเดอร์สำหรับเก็บรูปภาพ
+//         cb(null, './images');
+//     },
 
-    //เปลี่ยนชื่อไฟล์ป้องกันชื่อซ้ำกัน
-    filename: function (req, file, cb) {
-        cb(null, Date.now() + ".jpg")
-    }
+//     //เปลี่ยนชื่อไฟล์ป้องกันชื่อซ้ำกัน
+//     filename: function (req, file, cb) {
+//         cb(null, Date.now() + ".jpg")
+//     }
 
-})
+// })
 //เริ่มต้นการ upload
-const upload = multer({
-    storage: storage
-})
+// const upload = multer({
+//     storage: storage
+// })
 
-exports.upload = upload;*/
+// exports.upload = upload;*/
 
 exports.createFoods = async (req, res) => {
     try {
@@ -114,9 +90,9 @@ exports.getAllFoods = async (req, res) => {
 };
 exports.getfoodbycategory = async (req,res)=>{
     try{
-        const {cagetory} = req.params;
+        const {category} = req.params;
         console.log(category)
-        const foods = await Food.find({category:cagetory}).populate('images');
+        const foods = await Food.find({cagetory:category}).populate('images');
         
         res.json({
             foods

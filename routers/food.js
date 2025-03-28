@@ -6,7 +6,7 @@ const router = express.Router();
 router.get("/food",getAllFoods); 
 router.get("/food/:category", getfoodbycategory);     //  ดึงข้อมูลอาหารทั้งหมด
 //router.get("/food/:id",); //  ดึงข้อมูลอาหารตาม ID
-router.post("/food",createImages); //บันทึกรูปภาพ
+// router.post("/food",createImages); //บันทึกรูปภาพ
 router.post("/search/filters",searchFilters); //searchFilters
 //router.post("/foodby",listby); //list menu ออกมาโชว์
 router.post("/food",createFoods);    //  เพิ่มอาหารใหม่
