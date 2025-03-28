@@ -9,57 +9,50 @@ const Food = require("../Models/Food")
 
 exports.createReservation = async (req, res) => {
     try {
-        const { userId, tableId, reservation_time } = req.body;
+        const { userId, tableId, reservation_time, user_name } = req.body;
 
-        // ตรวจสอบว่ามีข้อมูลครบหรือไม่
-        if (!userId || !tableId || !reservation_time) {
-            return res.status(400).json({ message: "กรุณากรอกข้อมูลให้ครบถ้วน" });
+        // ตรวจสอบข้อมูลที่จำเป็น
+        if (!userId || !tableId || !reservation_time || !user_name) {
+          return res.status(400).json({ 
+            success: false,
+            message: "กรุณากรอกข้อมูลให้ครบถ้วน (userId, tableId, reservation_time, user_name)" 
+          });
         }
-
-        // ตรวจสอบว่า User มีอยู่จริงไหม
+    
+        // ตรวจสอบว่าผู้ใช้มีอยู่จริง
         const user = await User.findById(userId);
         if (!user) {
-            return res.status(404).json({ message: "ไม่พบผู้ใช้" });
+          return res.status(404).json({ 
+            success: false,
+            message: "ไม่พบผู้ใช้" 
+          });
         }
-
-        // ตรวจสอบว่า Table มีอยู่จริงไหม
+    
+        // ตรวจสอบว่าโต๊ะมีอยู่จริง
         const table = await Table.findById(tableId);
         if (!table) {
-            return res.status(404).json({ message: "ไม่พบโต๊ะที่ต้องการจอง" });
+          return res.status(404).json({ 
+            success: false,
+            message: "ไม่พบโต๊ะที่ต้องการจอง" 
+          });
         }
-
-        // สร้างการจอง
-        const newReservation = new Reservation({
-            user_name: user.name, // สมมติว่ามี `name` ใน User Model
-            userId,
-            tableId,
-            reservation_time,
-            status: "Reserved"
+    
+        // สร้างการจองใหม่
+        const reservation = new Reservation({
+          user_name,
+          userId,
+          tableId,
+          reservation_time: new Date(reservation_time),
+          status: "Reserved"
         });
-
-        await newReservation.save();
-
-        // ตั้งค่าให้ยกเลิกการจองอัตโนมัติหากเลยเวลา 5 นาที
-        const cancelTime = new Date(reservation_time).getTime() + 5 * 60 * 1000;
-        const now = new Date().getTime();
-        const timeRemaining = cancelTime - now;
-
-        if (timeRemaining > 0) {
-            setTimeout(async () => {
-                const updatedReservation = await Reservation.findById(newReservation._id);
-                if (updatedReservation && updatedReservation.status === "Reserved") {
-                    updatedReservation.status = "Cancel";
-                    await updatedReservation.save();
-                    console.log(`Reservation ${newReservation._id} ถูกยกเลิกอัตโนมัติ`);
-                }
-            }, timeRemaining);
-        }
-
+    
+        await reservation.save();
+    
         res.status(201).json({
-            message: "สร้างการจองสำเร็จ",
-            reservation: newReservation
-        });
-
+          success: true,
+          message: "สร้างการจองสำเร็จ",
+          data: reservation
+        })
     } catch (err) {
         console.log(err);
         res.status(500).json({ message: "Server Error" });
