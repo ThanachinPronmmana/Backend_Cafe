@@ -24,6 +24,10 @@ const ReservationSchema = mongoose.Schema({
     type: String,
     enum: ["Reserved", "Cancel", "Complete"],
     default: "Reserved"
+  },
+  number:{
+    type:Number,
+    required:false
   }
 }, { timestamps: true });
 

@@ -67,3 +67,17 @@ exports.updateTable = async(req,res)=>{
 
     }
 }
+// exports.listtableBy = async(req,res)=>{
+//     try{
+//         const {userId} = req.params
+//         const table = await Table.find({userId:userId}).populate("number")
+//         res.json({
+//             table
+//         })
+//     }catch(err){
+//         console.log(err)
+//         res.status(500).json({
+//             message:"Server Error"
+//         })
+//     }
+// }

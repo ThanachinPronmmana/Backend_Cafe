@@ -32,7 +32,7 @@ const userSchema = mongoose.Schema({
     reservationId:{
         type:mongoose.Schema.Types.ObjectId,
         ref:"Reservation",
-
+        required:false
     },
     tableId:{
         type:mongoose.Schema.Types.ObjectId,

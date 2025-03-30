@@ -14,6 +14,11 @@ const tableSchema = mongoose.Schema({
     status: { type: String, 
         enum: ["Available", "Reserved"], 
         default: "Available"
+    },
+    userId:{
+        type: mongoose.Schema.Types.ObjectId,
+        ref:"User",
+        required:false
     }
 }, { timestamps: true });
 
