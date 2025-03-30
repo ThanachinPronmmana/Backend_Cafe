@@ -55,8 +55,8 @@ exports.register = async(req,res)=>{
 exports.login = async (req, res) => {
     try {
       const { email, password } = req.body;  // คุณไม่จำเป็นต้องรับ name และ phone ในที่นี้
-      let user = await User.findOne({ email }); // ใช้ findOne แทนการใช้ findOneAndUpdate
-  
+      let user = await User.findOne({ email }); // ใช้ findOne แทนการใช้ findOneAndUpdat
+      console.log(user._id)
       if (user) {
         const isMatch = await bcrypt.compare(password, user.password);
         
@@ -68,6 +68,7 @@ exports.login = async (req, res) => {
         
         let payload = {
           user: {
+            userId:user._id,
             email: user.email,
             name: user.name,
             phone: user.phone

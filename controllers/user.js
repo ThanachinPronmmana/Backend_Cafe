@@ -206,8 +206,8 @@ exports.userCart = async (req, res) => {
 //แสดง cart user
 exports.getUserCart = async (req, res) => {
     try {
+        console.log("Help")
         const { id } = req.params; // รับ id ของ user จาก URL
-
         const cart = await Cart.findOne({ userId: id }).populate([
             {
                 path: "items.foodId",
