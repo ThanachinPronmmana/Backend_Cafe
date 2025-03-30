@@ -52,43 +52,44 @@ exports.register = async(req,res)=>{
         })
     }
 }
-exports.login = async(req,res)=>{
-    try{
-        const {email,password,name,phone} = req.body
-        let user = await User.findOneAndUpdate({
-            email
-        },{new:true})
-        if(user){
-            const isMatch = await bcrypt.compare(password,user.password)
-            if(!isMatch){
-                return res.status(400).json({
-                    message:"Password Invalid!!!"
-                })
-            }
-            let payload = {
-                user:{
-                    email:user.email,
-                    name:user.name,
-                    phone:user.phone
-                }
-            }
-            jwt.sign(payload,"Invincible",{expiresIn:"1d"},(err,token)=>{
-                if(err) throw err;
-                res.json({
-                    token,payload
-                })
-            })
-        }else{
-            return res.status(400).json({
-                message:"User not found"
-            })
+exports.login = async (req, res) => {
+    try {
+      const { email, password } = req.body;  // คุณไม่จำเป็นต้องรับ name และ phone ในที่นี้
+      let user = await User.findOne({ email }); // ใช้ findOne แทนการใช้ findOneAndUpdate
+  
+      if (user) {
+        const isMatch = await bcrypt.compare(password, user.password);
+        
+        if (!isMatch) {
+          return res.status(400).json({
+            message: "Password Invalid!!!"
+          });
         }
         
-    }catch(err){
-        console.log(err)
-        res.status(500).json({
-            message:"Server error"
-        })
+        let payload = {
+          user: {
+            email: user.email,
+            name: user.name,
+            phone: user.phone
+          }
+        };
+  
+        // ส่งข้อมูลของ user แทนการส่ง token
+        res.json({
+          user: payload.user
+        });
+      } else {
+        return res.status(400).json({
+          message: "User not found"
+        });
+      }
+  
+    } catch (err) {
+      console.log(err);
+      res.status(500).json({
+        message: "Server error"
+      });
     }
-}
+  };
+  
 
