@@ -335,6 +335,32 @@ exports.getorder = async (req, res) => {
         });
     }
 };
+exports.userbyid = async (req, res) => {
+    try {
+        const { id } = req.params;
+        const user = await User.findOne({ _id: id }).select("email name phone"); // ใช้ findOne()
+        
+        if (!user) {
+            return res.status(404).json({ message: "User not found" });
+        }
+
+        res.json(user); // ส่งออก Object โดยตรง
+    } catch (err) {
+        console.log(err);
+        res.status(500).json({ message: "Server Error" });
+    }
+};
+exports.removeCart = async(req,res)=>{
+    try{
+        const {userId} = req.params
+        await Cart.deleteMany({userId})
+        res.send("Delete cart Success")
+    }catch(err){
+        console.log(err);
+        res.status(500).json({ message: "Server Error" });
+    }
+}
+
 
 
 
