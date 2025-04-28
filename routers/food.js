@@ -1,12 +1,9 @@
 const express = require("express");
 const { 
   createFoods, 
-  upload, 
   getAllFoods, 
   updateFood, 
   deleteFood, 
-  createImages, 
-  listby, 
   searchFilters, 
   getfoodbycategory 
 } = require("../controllers/food");

@@ -5,6 +5,7 @@ const Table = require("../Models/Table")
 const Cart = require("../Models/Cart")
 const Order = require("../Models/Order")
 const Food = require("../Models/Food")
+const Time = require("../Models/Time")
 //const stripe = require("stripe")(process.env.STRIPE_SECRET_KEY)
 
 exports.createReservation = async (req, res) => {
@@ -88,47 +89,7 @@ exports.listByIdReservation = async (req, res) => {
         });
     }
 };
-// exports.updateReservation = async (req, res) => {
-//     try {
-//         const { id } = req.params;
-//         const reservation = await Reservation.findById(id)
 
-//         if(!reservation){
-//             return res.status(404).json({message:"Reservation not found"})
-//         }
-//         const formattedDate = new Date(reservation_time)
-//         const { user_name,reservation_time } = req.body
-//         const updateReservation = await Reservation.findOneAndUpdate(
-//             {_id:id},
-//             {user_name,reservation_time:formattedDate},
-//             {new:true}
-//         )
-//         res.json(updateReservation)
-
-//         // const updatereservation = await Reservation.findOneAndUpdate(
-//         //     { _id: id },  // 
-//         //     req.body,
-//         //     { new: true }
-//         // );
-
-//         // if (!tableId) {
-//         //     return res.status(404).json({
-//         //         message: "table no found"
-//         //     })
-//         // }
-
-//         // if (!reservation) {
-//         //     return res.status(404).json({
-//         //         message: "Reservation not found"
-//         //     });
-//         // }
-//     } catch (err) {
-//         console.log(err);
-//         res.status(500).json({
-//             message: "Server Error"
-//         });
-//     }
-// };
 exports.removeReservation = async (req, res) => {
     try {
         const { id } = req.params
@@ -165,10 +126,11 @@ exports.listUser = async (req, res) => {
 //check userCart
 exports.userCart = async (req, res) => {
     try {
-        const { userId, quantity, foodId, reservationId, cartId, } = req.body
+        const { userId, quantity, foodId, cartId} = req.body
         console.log(userId)
+        const reservationId = req.body.reservationId || null
         const food = await Food.findById(foodId)
-
+        
 
         let cart = await Cart.findOne({ userId })
         if (!cart) {
@@ -227,6 +189,7 @@ exports.getUserCart = async (req, res) => {
 
         res.json({
             message: "Cart retrieved successfully",
+            cartId:cart._id,
             foods: cart.items,
             tableId: cart.reservationId ? cart.reservationId.tableId : null, // ดึง tableId ถ้ามี
             cartTotal: cart.total_price
@@ -240,33 +203,9 @@ exports.getUserCart = async (req, res) => {
     }
 };
 
-//ในกรณีที่ตะกร้าว่างเปล่า
-// exports.emptyCart = async (req, res) => {
-//     try {
-//         const cart = await Cart.findOne({ userId: req.user.id })
-//         if (!cart) {
-//             return res.status(400).json({
-//                 message: "Cart not found"
-//             })
-//         }
-//         const result = await Cart.deleteMany({
-//             userId: req.user.id
-//         })
-//         res.json({
-//             message: "Cart Empty Success",
-//             deleteCount: result.count
-//         })
-//     }
-//     catch (err) {
-//         console.log(err)
-//         res.status(500).json({
-//             message: "Server Error"
-//         })
-//     }
-// }
 exports.saveorder = async (req, res) => {
     try {
-        const { userId, items, cartId, reservationId, order_status } = req.body
+        const { userId, cartId,reservationId} = req.body
         const usercart = await Cart.findOne({ _id: cartId, userId }).populate("items.foodId")
         if (!usercart) {
             return res.status(500).json({
@@ -277,7 +216,7 @@ exports.saveorder = async (req, res) => {
         const newOrder = new Order({
             userId: usercart.userId,
             cartId: usercart._id,
-            reservationId: usercart.reservationId,
+            reservationId: reservationId||usercart.reservationId||null,
             items: usercart.items.map((item) => ({
                 foodId: item.foodId._id,
                 quantity: item.quantity,
@@ -304,37 +243,29 @@ exports.saveorder = async (req, res) => {
         })
     }
 }
-// exports.deleteOrder = async(req,res)=>{
-//     try{
-//         const {id} = req.params
+// exports.getorder = async (req, res) => {
+//     try {
+//         const { userId } = req.body;
 
-//     }catch(err){
 
+//         const orders = await Order.find({ userId }).populate("items.foodId");
+
+
+//         if (orders.length === 0) {
+//             return res.status(404).json({
+//                 message: "No orders found for this user"
+//             });
+//         }
+
+//         res.json(orders);
+//     } catch (err) {
+//         console.error("Error fetching orders:", err);
+//         res.status(500).json({
+//             message: "Server Error",
+//             error: err.message
+//         });
 //     }
-// }
-exports.getorder = async (req, res) => {
-    try {
-        const { userId } = req.body;
-
-
-        const orders = await Order.find({ userId }).populate("items.foodId");
-
-
-        if (orders.length === 0) {
-            return res.status(404).json({
-                message: "No orders found for this user"
-            });
-        }
-
-        res.json(orders);
-    } catch (err) {
-        console.error("Error fetching orders:", err);
-        res.status(500).json({
-            message: "Server Error",
-            error: err.message
-        });
-    }
-};
+// };
 exports.userbyid = async (req, res) => {
     try {
         const { id } = req.params;

@@ -28,6 +28,11 @@ const ReservationSchema = mongoose.Schema({
   number:{
     type:Number,
     required:false
+  },
+  timeId:{
+    type:mongoose.Schema.Types.ObjectId,
+    ref:"Time",
+    required:true
   }
 }, { timestamps: true });
 

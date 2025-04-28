@@ -9,16 +9,16 @@ const {createReservation,
     getUserCart,
     saveorder,
     getorder,
-    userbyid,
-    removeCart
+    removeCart,
+    userbyid
 
 } = require("../controllers/user")
 
 
-router.post("/reservation",createReservation)
-router.get("/reservation",listReservation)
-router.get("/reservation/:id",listByIdReservation)
-router.delete("/reservation/:id",removeReservation)
+// router.post("/reservation",createReservation)
+// router.get("/reservation",listReservation)
+// router.get("/reservation/:id",listByIdReservation)
+// router.delete("/reservation/:id",removeReservation)
 
 router.get("/user",listUser)
 router.post("/user",userCart)
@@ -27,7 +27,7 @@ router.delete("/user/:userId",removeCart)
 
 
 router.post("/order",saveorder)
-router.get("/order",getorder)
+// router.get("/order", )
 
 router.get("/profile/:id",userbyid)
 
